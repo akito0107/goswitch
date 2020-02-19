@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"log"
@@ -128,15 +129,25 @@ func LSRemote(c context.Context) error {
 
 	currentMinor := vs[0].Minor()
 
-	fmt.Println("available versions")
-	for _, v := range vs {
+	fmt.Println()
+	fmt.Println("available versions:")
+	fmt.Println()
+
+	var buf bytes.Buffer
+	for i, v := range vs {
 		if currentMinor != v.Minor() {
-			fmt.Println()
+			fmt.Fprintln(&buf)
 			currentMinor = v.Minor()
+		} else if i != 0 {
+			fmt.Fprintf(&buf, ", ")
 		}
 
-		fmt.Printf("%s, ", v)
+		fmt.Fprintf(&buf, "%s", v)
 	}
+
+	fmt.Println(buf.String())
+
+	fmt.Println()
 
 	return nil
 }
