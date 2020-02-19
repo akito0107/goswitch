@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os"
 
 	"github.com/akito0107/switchgo/internal"
@@ -13,7 +14,8 @@ func main() {
 			{
 				Name: "use",
 				Action: func(c *cli.Context) error {
-					return nil
+					v := c.Args().Get(0)
+					return internal.Use(c.Context, v)
 				},
 			},
 			{
@@ -31,5 +33,7 @@ func main() {
 		},
 	}
 
-	app.Run(os.Args)
+	if err := app.Run(os.Args); err != nil {
+		log.Fatal(err)
+	}
 }
