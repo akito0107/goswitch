@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/akito0107/switchgo/internal"
+	"github.com/akito0107/goswitch/internal"
 	"github.com/urfave/cli/v2"
 )
 

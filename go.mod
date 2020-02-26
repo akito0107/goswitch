@@ -1,4 +1,4 @@
-module github.com/akito0107/switchgo
+module github.com/akito0107/goswitch
 
 go 1.14
 
