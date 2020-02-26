@@ -10,18 +10,14 @@ import (
 
 func main() {
 	app := &cli.App{
+		Name:  "goswitch",
+		Usage: "go version switching utility",
 		Commands: []*cli.Command{
 			{
 				Name: "use",
 				Action: func(c *cli.Context) error {
 					v := c.Args().Get(0)
 					return internal.Use(c.Context, v)
-				},
-			},
-			{
-				Name: "ls",
-				Action: func(c *cli.Context) error {
-					return nil
 				},
 			},
 			{
