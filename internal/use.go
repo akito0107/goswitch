@@ -43,18 +43,19 @@ func Use(ctx context.Context, version string) error {
 	log.Println("switch go version")
 
 	gobin := gobinPath()
-
-	if info, err := os.Lstat(gobin + "/go"); err == nil {
+	symlinkPath := filepath.Join(gobin, "go")
+	if info, err := os.Lstat(symlinkPath); err == nil {
 		if info.Mode()&os.ModeSymlink != os.ModeSymlink {
 			return fmt.Errorf("go command is not a symlink but %s, goswitch use symlink. please delete or make a symlink", info.Mode())
 		}
 
-		if err := os.Remove(gobin + "/go"); err != nil {
+		if err := os.Remove(symlinkPath); err != nil {
 			return fmt.Errorf("remove go link failed: %w", err)
 		}
 	}
 
-	if err := os.Symlink(gobin+"/"+version, gobin+"/go"); err != nil {
+
+	if err := os.Symlink(filepath.Join(gobin, version), symlinkPath); err != nil {
 		return fmt.Errorf("create symlink failed: %w", err)
 	}
 
@@ -73,7 +74,7 @@ func gobinPath() string {
 
 func versionExists(version string) bool {
 	gobin := gobinPath()
-	_, err := os.Stat(gobin + "/" + version)
+	_, err := os.Stat(filepath.Join(gobin, version))
 
 	return err == nil
 }
