@@ -14,14 +14,16 @@ func main() {
 		Usage: "go version switching utility",
 		Commands: []*cli.Command{
 			{
-				Name: "use",
+				Name:  "use",
+				Usage: "switch current go version",
 				Action: func(c *cli.Context) error {
 					v := c.Args().Get(0)
 					return internal.Use(c.Context, v)
 				},
 			},
 			{
-				Name: "ls-remote",
+				Name:  "ls-remote",
+				Usage: "show all available versions",
 				Action: func(c *cli.Context) error {
 					return internal.LSRemote(c.Context)
 				},
