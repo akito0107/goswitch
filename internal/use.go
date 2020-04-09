@@ -3,9 +3,11 @@ package internal
 import (
 	"context"
 	"fmt"
+	"go/build"
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 )
 
 const goGetURL = "golang.org/dl/"
@@ -63,8 +65,7 @@ func gobinPath() string {
 	gobin := os.Getenv("GOBIN")
 
 	if gobin == "" {
-		gp := os.Getenv("GOPATH")
-		gobin = gp + "/bin"
+		gobin = filepath.Join(build.Default.GOPATH, "bin")
 	}
 
 	return gobin
