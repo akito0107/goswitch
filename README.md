@@ -22,7 +22,7 @@ $ go version
 go version go1.13.10 darwin/amd64
 ```
 
-2. show all available verison by `goswitch ls-remote`
+2. show all available versions by `goswitch ls-remote`
 
 ```
 $ goswitch ls-remote
