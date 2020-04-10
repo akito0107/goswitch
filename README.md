@@ -70,6 +70,16 @@ $ go version
 go version go1.14.2 darwin/amd64
 ```
 
+5. (option) using system go version
+
+You can use `system` verison go.
+
+```
+$ goswitch use system
+```
+
+`goswitch use system` just remove `$GOBIN/go` symlink.
+
 ## Options
 ```sh
 $ goswitch -h
