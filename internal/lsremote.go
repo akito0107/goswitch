@@ -132,6 +132,7 @@ func LSRemote(c context.Context) error {
 	fmt.Println()
 	fmt.Println("available versions:")
 	fmt.Println()
+	fmt.Println("system")
 
 	var buf bytes.Buffer
 	for i, v := range vs {
