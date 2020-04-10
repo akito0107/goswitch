@@ -30,7 +30,7 @@ func Use(ctx context.Context, version string) error {
 
 		getcmd.Stdout = log.Writer()
 		getcmd.Stderr = log.Writer()
-		getcmd.Env = append(getcmd.Env, "GO111MODULE=off")
+		getcmd.Env = append(os.Environ(), "GO111MODULE=off")
 
 		if err := getcmd.Run(); err != nil {
 			return fmt.Errorf("go get failed: %w", err)
