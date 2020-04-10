@@ -20,8 +20,7 @@ func Use(ctx context.Context, version string) error {
 	if version == "system" {
 		log.Println("using system go")
 		log.Println("removing symlink...")
-		rmSymlink(symlinkPath)
-		return nil
+		return rmSymlink(symlinkPath)
 	}
 
 	if !versionExists(version) {
@@ -52,7 +51,9 @@ func Use(ctx context.Context, version string) error {
 	log.Println("download finished.")
 	log.Println("switch go version")
 
-	rmSymlink(symlinkPath)
+	if err := rmSymlink(symlinkPath); err != nil {
+		return err
+	}
 
 	if err := os.Symlink(filepath.Join(gobin, version), symlinkPath); err != nil {
 		return fmt.Errorf("create symlink failed: %w", err)
