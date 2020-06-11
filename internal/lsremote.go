@@ -39,6 +39,16 @@ func (g goversion) Minor() int {
 		return i
 	}
 
+	if strings.Contains(vs[1], "beta") {
+		p := strings.SplitN(vs[1], "beta", 2)
+		i, err := strconv.Atoi(p[0])
+		if err != nil {
+			log.Panic(err)
+		}
+
+		return i
+	}
+
 	i, err := strconv.Atoi(vs[1])
 	if err != nil {
 		log.Panic(err)
@@ -58,6 +68,18 @@ func (g goversion) RCVersion() int {
 		log.Panic(err)
 	}
 
+	return i
+}
+
+func (g goversion) BetaVersion() int {
+	vs := strings.SplitN(string(g), "beta", 2)
+	if len(vs) == 1 {
+		return 1000
+	}
+	i, err := strconv.Atoi(vs[1])
+	if err != nil {
+		log.Panic(err)
+	}
 	return i
 }
 
@@ -157,6 +179,10 @@ func sortVersions(versions []goversion) []goversion {
 	sort.Slice(versions, func(i, j int) bool {
 		if versions[i].Minor() != versions[j].Minor() {
 			return versions[i].Minor() < versions[j].Minor()
+		}
+
+		if versions[i].BetaVersion() != versions[j].BetaVersion() {
+			return versions[i].BetaVersion() < versions[j].BetaVersion()
 		}
 
 		if versions[i].RCVersion() != versions[j].RCVersion() {

@@ -28,9 +28,14 @@ func Test_sortVersions(t *testing.T) {
 			expect: []goversion{"1.13rc1", "1.13", "1.13.1"},
 		},
 		{
+			name:   "with beta",
+			in:     []goversion{"1.13beta1", "1.13.1", "1.13"},
+			expect: []goversion{"1.13beta1", "1.13", "1.13.1"},
+		},
+		{
 			name:   "complex case",
-			in:     []goversion{"1.13rc1", "1.13.1", "1.13", "1.1", "1.14rc1", "1.13rc2"},
-			expect: []goversion{"1.1", "1.13rc1", "1.13rc2", "1.13", "1.13.1", "1.14rc1"},
+			in:     []goversion{"1.13rc1", "1.13beta1", "1.13.1", "1.13", "1.1", "1.14rc1", "1.13rc2"},
+			expect: []goversion{"1.1", "1.13beta1", "1.13rc1", "1.13rc2", "1.13", "1.13.1", "1.14rc1"},
 		},
 	}
 
