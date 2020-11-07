@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/google/go-github/v32/github"
 	"golang.org/x/net/html"
 )
 
@@ -95,6 +96,52 @@ func (g goversion) Patch() int {
 	return i
 }
 
+const initialPage = 4
+const perPage = 30 // max
+
+func LSRemoteGH(c context.Context) error {
+    client := github.NewClient(nil)
+
+    var versions []goversion
+    page := initialPage
+    for {
+		tags, next, err := fetchNextTags(c, client, page)
+		if err != nil {
+			return fmt.Errorf("fetchTags failed: %w", err)
+		}
+		if next == 0 {
+			break
+		}
+		versions = append(versions, tags...)
+		page = next
+	}
+
+	versions = sortVersions(versions)
+	printVersions(versions)
+
+    return nil
+}
+
+func fetchNextTags(c context.Context, client *github.Client, nextPage int) ([]goversion, int, error) {
+	tags, resp, err := client.Repositories.ListTags(c, "golang", "go", &github.ListOptions{
+		Page: nextPage,
+		PerPage: perPage,
+	})
+	if err != nil {
+		return nil, 0, fmt.Errorf("page %d fetch failed: %w", nextPage, err)
+	}
+
+	var result []goversion
+
+	for _, t := range tags {
+		if strings.HasPrefix(t.GetName(), "go1") {
+			result = append(result, goversion(t.GetName()))
+		}
+	}
+
+	return result, resp.NextPage, nil
+}
+
 const goDLURL = "https://golang.org/dl/"
 
 func LSRemote(c context.Context) error {
@@ -135,11 +182,35 @@ func LSRemote(c context.Context) error {
 	f(doc)
 
 	versions = sortVersions(versions)
+	printVersions(versions)
 
+	return nil
+}
+
+func sortVersions(versions []goversion) []goversion {
+	sort.Slice(versions, func(i, j int) bool {
+		if versions[i].Minor() != versions[j].Minor() {
+			return versions[i].Minor() < versions[j].Minor()
+		}
+
+		if versions[i].BetaVersion() != versions[j].BetaVersion() {
+			return versions[i].BetaVersion() < versions[j].BetaVersion()
+		}
+
+		if versions[i].RCVersion() != versions[j].RCVersion() {
+			return versions[i].RCVersion() < versions[j].RCVersion()
+		}
+
+		return versions[i].Patch() < versions[j].Patch()
+	})
+
+	return versions
+}
+
+func printVersions(versions []goversion) {
 	m := make(map[goversion]struct{})
 
 	var vs []goversion
-
 	for _, v := range versions {
 		_, ok := m[v]
 		if ok {
@@ -169,28 +240,4 @@ func LSRemote(c context.Context) error {
 	}
 
 	fmt.Println(buf.String())
-
-	fmt.Println()
-
-	return nil
-}
-
-func sortVersions(versions []goversion) []goversion {
-	sort.Slice(versions, func(i, j int) bool {
-		if versions[i].Minor() != versions[j].Minor() {
-			return versions[i].Minor() < versions[j].Minor()
-		}
-
-		if versions[i].BetaVersion() != versions[j].BetaVersion() {
-			return versions[i].BetaVersion() < versions[j].BetaVersion()
-		}
-
-		if versions[i].RCVersion() != versions[j].RCVersion() {
-			return versions[i].RCVersion() < versions[j].RCVersion()
-		}
-
-		return versions[i].Patch() < versions[j].Patch()
-	})
-
-	return versions
 }
