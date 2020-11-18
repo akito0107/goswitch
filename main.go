@@ -4,8 +4,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/akito0107/goswitch/internal"
 	"github.com/urfave/cli/v2"
+
+	"github.com/akito0107/goswitch/internal"
 )
 
 func main() {
@@ -24,7 +25,18 @@ func main() {
 			{
 				Name:  "ls-remote",
 				Usage: "show all available versions",
+				Flags: []cli.Flag{
+					&cli.BoolFlag{
+						Name:        "use-github",
+						Aliases:     []string{"g"},
+						Usage:       "use github tags",
+						Required:    false,
+					},
+				},
 				Action: func(c *cli.Context) error {
+					if c.Bool("use-github") {
+						return internal.LSRemoteGH(c.Context)
+					}
 					return internal.LSRemote(c.Context)
 				},
 			},
