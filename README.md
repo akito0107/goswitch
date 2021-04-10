@@ -6,9 +6,11 @@ goswitch is just a wrapper for `go get` and `ln -s`.
 ## How to use
 
 ### Prerequisites
+
 - Go 1.13+
 
 ### Installing
+
 ```
 $ go get -u github.com/akito0107/goswitch
 ```
@@ -63,7 +65,7 @@ Success. You may now run 'go1.14.2'
 2020/04/09 11:23:23 switch go version
 ```
 
-4. check current version 
+4. check current version
 
 ```
 $ go version
@@ -81,6 +83,7 @@ $ goswitch use system
 `goswitch use system` just remove `$GOBIN/go` symlink.
 
 ## Options
+
 ```sh
 $ goswitch -h
 NAME:
@@ -98,5 +101,19 @@ GLOBAL OPTIONS:
    --help, -h  show help (default: false)
 ```
 
+```sh
+$ goswitch ls-remote -h
+NAME:
+   goswitch ls-remote - show all available versions
+
+USAGE:
+   goswitch ls-remote [command options][arguments...]
+
+OPTIONS:
+   --use-github, -g  use github tags (default: false)
+   --help, -h        show help (default: false)
+```
+
 ## License
+
 This project is licensed under the Apache License 2.0 License - see the [LICENSE](LICENSE) file for details
