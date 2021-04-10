@@ -29,32 +29,10 @@ func (g goversion) Minor() int {
 	if len(vs) == 1 {
 		return 0
 	}
-
-	if strings.Contains(vs[1], "rc") {
-		p := strings.SplitN(vs[1], "rc", 2)
-		i, err := strconv.Atoi(p[0])
-		if err != nil {
-			log.Panic(err)
-		}
-
-		return i
-	}
-
-	if strings.Contains(vs[1], "beta") {
-		p := strings.SplitN(vs[1], "beta", 2)
-		i, err := strconv.Atoi(p[0])
-		if err != nil {
-			log.Panic(err)
-		}
-
-		return i
-	}
-
-	i, err := strconv.Atoi(vs[1])
+	i, err := strconv.Atoi(trimExtra(vs[1]))
 	if err != nil {
 		log.Panic(err)
 	}
-
 	return i
 }
 
@@ -89,11 +67,22 @@ func (g goversion) Patch() int {
 	if len(vs) != 3 {
 		return 0
 	}
-	i, err := strconv.Atoi(vs[2])
+	i, err := strconv.Atoi(trimExtra(vs[2]))
 	if err != nil {
 		log.Panic(err)
 	}
 	return i
+}
+
+func trimExtra(v string) string {
+	extras := []string{"beta", "rc"}
+	for _, extra := range extras {
+		index := strings.Index(v, extra)
+		if index >= 0 {
+			return v[:index]
+		}
+	}
+	return v
 }
 
 const initialPage = 4
@@ -192,16 +181,13 @@ func sortVersions(versions []goversion) []goversion {
 		if versions[i].Minor() != versions[j].Minor() {
 			return versions[i].Minor() < versions[j].Minor()
 		}
-
+		if versions[i].Patch() != versions[j].Patch() {
+			return versions[i].Patch() < versions[j].Patch()
+		}
 		if versions[i].BetaVersion() != versions[j].BetaVersion() {
 			return versions[i].BetaVersion() < versions[j].BetaVersion()
 		}
-
-		if versions[i].RCVersion() != versions[j].RCVersion() {
-			return versions[i].RCVersion() < versions[j].RCVersion()
-		}
-
-		return versions[i].Patch() < versions[j].Patch()
+		return versions[i].RCVersion() < versions[j].RCVersion()
 	})
 
 	return versions

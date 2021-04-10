@@ -37,6 +37,11 @@ func Test_sortVersions(t *testing.T) {
 			in:     []goversion{"1.13rc1", "1.13beta1", "1.13.1", "1.13", "1.1", "1.14rc1", "1.13rc2"},
 			expect: []goversion{"1.1", "1.13beta1", "1.13rc1", "1.13rc2", "1.13", "1.13.1", "1.14rc1"},
 		},
+		{
+			name:   "patch with rc",
+			in:     []goversion{"go1.9", "go1.9.2", "go1.9.2rc2"},
+			expect: []goversion{"go1.9", "go1.9.2rc2", "go1.9.2"},
+		},
 	}
 
 	for _, c := range cases {
