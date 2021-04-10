@@ -89,11 +89,11 @@ const initialPage = 4
 const perPage = 30 // max
 
 func LSRemoteGH(c context.Context) error {
-    client := github.NewClient(nil)
+	client := github.NewClient(nil)
 
-    var versions []goversion
-    page := initialPage
-    for {
+	var versions []goversion
+	page := initialPage
+	for {
 		tags, next, err := fetchNextTags(c, client, page)
 		if err != nil {
 			return fmt.Errorf("fetchTags failed: %w", err)
@@ -108,12 +108,12 @@ func LSRemoteGH(c context.Context) error {
 	versions = sortVersions(versions)
 	printVersions(versions)
 
-    return nil
+	return nil
 }
 
 func fetchNextTags(c context.Context, client *github.Client, nextPage int) ([]goversion, int, error) {
 	tags, resp, err := client.Repositories.ListTags(c, "golang", "go", &github.ListOptions{
-		Page: nextPage,
+		Page:    nextPage,
 		PerPage: perPage,
 	})
 	if err != nil {
