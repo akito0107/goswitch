@@ -1,10 +1,8 @@
 name: Go
 
 on:
-  push:
-    branches: [master]
-  pull_request:
-    branches: [master]
+  schedule:
+    - cron: "30 12 * * *"
 
 jobs:
   build:
@@ -28,7 +26,10 @@ jobs:
           fi
 
       - name: Build
-        run: go build -v main.go
+        run: go build -o goswitch -v main.go
 
-      - name: Test
-        run: go test -v ./...
+      - name: run ls-remote
+        run: ./goswitch ls-remote
+
+      - name: run ls-remote github
+        run: ./goswitch ls-remote --use-github
