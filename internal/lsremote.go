@@ -29,32 +29,10 @@ func (g goversion) Minor() int {
 	if len(vs) == 1 {
 		return 0
 	}
-
-	if strings.Contains(vs[1], "rc") {
-		p := strings.SplitN(vs[1], "rc", 2)
-		i, err := strconv.Atoi(p[0])
-		if err != nil {
-			log.Panic(err)
-		}
-
-		return i
-	}
-
-	if strings.Contains(vs[1], "beta") {
-		p := strings.SplitN(vs[1], "beta", 2)
-		i, err := strconv.Atoi(p[0])
-		if err != nil {
-			log.Panic(err)
-		}
-
-		return i
-	}
-
-	i, err := strconv.Atoi(vs[1])
+	i, err := strconv.Atoi(trimExtra(vs[1]))
 	if err != nil {
 		log.Panic(err)
 	}
-
 	return i
 }
 
@@ -89,22 +67,33 @@ func (g goversion) Patch() int {
 	if len(vs) != 3 {
 		return 0
 	}
-	i, err := strconv.Atoi(vs[2])
+	i, err := strconv.Atoi(trimExtra(vs[2]))
 	if err != nil {
 		log.Panic(err)
 	}
 	return i
 }
 
+func trimExtra(v string) string {
+	extras := []string{"beta", "rc"}
+	for _, extra := range extras {
+		index := strings.Index(v, extra)
+		if index >= 0 {
+			return v[:index]
+		}
+	}
+	return v
+}
+
 const initialPage = 4
 const perPage = 30 // max
 
 func LSRemoteGH(c context.Context) error {
-    client := github.NewClient(nil)
+	client := github.NewClient(nil)
 
-    var versions []goversion
-    page := initialPage
-    for {
+	var versions []goversion
+	page := initialPage
+	for {
 		tags, next, err := fetchNextTags(c, client, page)
 		if err != nil {
 			return fmt.Errorf("fetchTags failed: %w", err)
@@ -119,12 +108,12 @@ func LSRemoteGH(c context.Context) error {
 	versions = sortVersions(versions)
 	printVersions(versions)
 
-    return nil
+	return nil
 }
 
 func fetchNextTags(c context.Context, client *github.Client, nextPage int) ([]goversion, int, error) {
 	tags, resp, err := client.Repositories.ListTags(c, "golang", "go", &github.ListOptions{
-		Page: nextPage,
+		Page:    nextPage,
 		PerPage: perPage,
 	})
 	if err != nil {
@@ -192,16 +181,13 @@ func sortVersions(versions []goversion) []goversion {
 		if versions[i].Minor() != versions[j].Minor() {
 			return versions[i].Minor() < versions[j].Minor()
 		}
-
+		if versions[i].Patch() != versions[j].Patch() {
+			return versions[i].Patch() < versions[j].Patch()
+		}
 		if versions[i].BetaVersion() != versions[j].BetaVersion() {
 			return versions[i].BetaVersion() < versions[j].BetaVersion()
 		}
-
-		if versions[i].RCVersion() != versions[j].RCVersion() {
-			return versions[i].RCVersion() < versions[j].RCVersion()
-		}
-
-		return versions[i].Patch() < versions[j].Patch()
+		return versions[i].RCVersion() < versions[j].RCVersion()
 	})
 
 	return versions
