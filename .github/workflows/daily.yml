@@ -1,4 +1,4 @@
-name: Dayly
+name: Daily
 
 on:
   schedule:
