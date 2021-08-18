@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"go/build"
@@ -8,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 )
 
 const goGetURL = "golang.org/dl/"
@@ -24,18 +26,28 @@ func Use(ctx context.Context, version string) error {
 	}
 
 	if !versionExists(version) {
-		getcmd := exec.CommandContext(ctx, "go", "get", goGetURL+version)
-		log.Println("start go get...")
-		log.Printf("go get %s%s\n", goGetURL, version)
-
-		getcmd.Stdout = log.Writer()
-		getcmd.Stderr = log.Writer()
-		getcmd.Env = append(os.Environ(), "GO111MODULE=off")
-
-		if err := getcmd.Run(); err != nil {
-			return fmt.Errorf("go get failed: %w", err)
+		v, err := currentGoVersion(ctx)
+		if err != nil {
+			return fmt.Errorf("get current go version: %w", err)
 		}
-		log.Println("go get finished. start download")
+		var cmd *exec.Cmd
+		if v.Major() > 1 || (v.Major() == 1 && v.Minor() >= 17) {
+			cmd = exec.CommandContext(ctx, "go", "install", goGetURL+version+"@latest")
+		} else {
+			cmd = exec.CommandContext(ctx, "go", "get", goGetURL+version)
+			cmd.Env = append(os.Environ(), "GO111MODULE=off")
+		}
+		sub := cmd.Args[1]
+		log.Printf("start go %s...", sub)
+		log.Print(strings.Join(cmd.Args, " "))
+
+		cmd.Stdout = log.Writer()
+		cmd.Stderr = log.Writer()
+
+		if err := cmd.Run(); err != nil {
+			return fmt.Errorf("go %s failed: %w", sub, err)
+		}
+		log.Printf("go %s finished. start download", sub)
 	} else {
 		log.Printf("already exists version: %s, start download\n", version)
 	}
@@ -92,4 +104,12 @@ func versionExists(version string) bool {
 	_, err := os.Stat(filepath.Join(gobin, version))
 
 	return err == nil
+}
+
+func currentGoVersion(ctx context.Context) (goversion, error) {
+	b, err := exec.CommandContext(ctx, "go", "env", "GOVERSION").Output()
+	if err != nil {
+		return "", fmt.Errorf("exec go env GOVERSION: %w", err)
+	}
+	return goversion(bytes.TrimSuffix(b, []byte("\n"))), nil
 }
