@@ -155,7 +155,7 @@ func LSRemote(c context.Context) error {
 	var versions []goversion
 
 	f = func(n *html.Node) {
-		if n.Type == html.ElementNode && n.Data == "h2" {
+		if n.Type == html.ElementNode && n.Data == "h3" {
 			maybeVersion := n.FirstChild.Data
 
 			if strings.HasPrefix(maybeVersion, "go1") {
@@ -169,6 +169,10 @@ func LSRemote(c context.Context) error {
 	}
 
 	f(doc)
+
+	if len(versions) == 0 {
+		panic("Maybe the DOM structure has changed. Would you please file an issue https://github.com/akito0107/goswitch/issues/new")
+	}
 
 	versions = sortVersions(versions)
 	printVersions(versions)
