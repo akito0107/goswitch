@@ -32,3 +32,11 @@ jobs:
 
       - name: Test
         run: go test -v ./...
+
+      - name: Build
+        run: go build -v main.go
+        working-directory: v2
+
+      - name: Test
+        run: go test -v ./...
+        working-directory: v2
