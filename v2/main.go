@@ -6,7 +6,7 @@ import (
 
 	"github.com/urfave/cli/v2"
 
-	"github.com/akito0107/goswitch/internal/v2"
+	"github.com/akito0107/goswitch/v2/internal"
 )
 
 func main() {
