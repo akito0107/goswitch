@@ -27,17 +27,17 @@ func main() {
 				Usage: "show all available versions",
 				Flags: []cli.Flag{
 					&cli.BoolFlag{
-						Name:     "use-github",
-						Aliases:  []string{"g"},
-						Usage:    "use github tags",
-						Required: false,
+						Name:        "use-github",
+						Aliases:     []string{"g"},
+						Usage:       "use github tags",
+						Required:    false,
 					},
 				},
 				Action: func(c *cli.Context) error {
 					if c.Bool("use-github") {
-						log.Println("Using github releases is now enabled by default, so this option no longer has any effect.")
+						return internal.LSRemoteGH(c.Context)
 					}
-					return internal.LSRemoteGH(c.Context)
+					return internal.LSRemote(c.Context)
 				},
 			},
 		},
