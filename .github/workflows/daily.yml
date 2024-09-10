@@ -1,10 +1,8 @@
-name: Go
+name: Daily
 
 on:
-  push:
-    branches: [master]
-  pull_request:
-    branches: [master]
+  schedule:
+    - cron: "0 4 * * *"
 
 jobs:
   build:
@@ -14,7 +12,7 @@ jobs:
       - name: Set up Go 1.x
         uses: actions/setup-go@v2
         with:
-          go-version: ^1.23
+          go-version: ^1.16
 
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2
@@ -28,7 +26,10 @@ jobs:
           fi
 
       - name: Build
-        run: go build -v main.go
+        run: go build -o goswitch -v main.go
 
-      - name: Test
-        run: go test -v ./...
+      - name: run ls-remote
+        run: ./goswitch ls-remote
+
+      - name: run ls-remote github
+        run: ./goswitch ls-remote --use-github
